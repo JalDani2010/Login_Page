@@ -11,14 +11,24 @@
     
 <h1>Sign Up</h1>
 
-    <form action="/signup" method="post" >
-        <input placeholder="Name" name="name" type="text">
+    <form action="/signup" method="post">
+        <label for="name">Name:</label>
+        <input id="name" placeholder="Name" name="name" type="text" required>
         <br>
-        <input placeholder="Email" name="email" type="text">
+        
+        <label for="email">Email:</label>
+        <input id="email" placeholder="Email" name="email" type="email" required>
         <br>
-        <input placeholder="Password" name="password" type="password">
+        
+        <label for="password">Password:</label>
+        <input id="password" placeholder="Password" name="password" type="password" required>
         <br>
-        <input class="sub" type="submit">
+        
+        <label for="mobile_number">Mobile Number:</label>
+        <input id="mobile_number" placeholder="Mobile Number" name="mobile_number" type="tel" required>
+        <br>
+        
+        <input class="sub" type="submit" value="Sign Up">
     </form>
 
        <a href="/">Go back to login page</a>

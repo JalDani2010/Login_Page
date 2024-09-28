@@ -30,6 +30,7 @@ app.post("/signup", async (req, res) => {
     name: req.body.name,
     email: req.body.email,
     password: req.body.password,
+    mobile_number: req.body.mobile_number,
   };
 
   try {
