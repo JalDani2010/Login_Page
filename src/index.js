@@ -4,19 +4,19 @@ const app = express();
 const hbs = require("hbs");
 const LogInCollection = require("./mongoose.js");
 const port = process.env.PORT || 3000;
+const connectDB = require("./db.js");
+
+connectDB();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 const tempelatePath = path.join(__dirname, "../templates");
 const publicPath = path.join(__dirname, "../public");
-// console.log(publicPath);
 
 app.set("view engine", "hbs");
 app.set("views", tempelatePath);
 app.use(express.static(publicPath));
-
-// hbs.registerPartials(partialPath)
 
 app.get("/signup", (req, res) => {
   res.render("signup");
@@ -26,27 +26,37 @@ app.get("/", (req, res) => {
 });
 
 app.post("/signup", async (req, res) => {
-  const data = {
-    name: req.body.name,
-    email: req.body.email,
-    password: req.body.password,
-    mobile_number: req.body.mobile_number,
-  };
+  const { name, email, password, confirmPassword, mobile_number } = req.body;
+
+  // Check if password and confirm password match
+  if (password !== confirmPassword) {
+    return res.send("Passwords do not match!");
+  }
 
   try {
-    const checking = await LogInCollection.findOne({ email: req.body.email });
+    const checking = await LogInCollection.findOne({ email });
 
     if (checking) {
-      return res.send("user details already exist");
+      return res.send("User details already exist");
     } else {
-      const newUser = new LogInCollection(data);
+      const newUser = new LogInCollection({
+        name,
+        email,
+        password,
+        mobile_number,
+      });
+
+      // Confirm password is set in schema, but it won't be saved in DB
+      newUser.confirmPassword = confirmPassword;
+
       await newUser.save();
 
       return res.status(201).render("home", {
-        naming: req.body.name,
+        naming: name,
       });
     }
   } catch (e) {
+    console.error(e);
     return res.send("Error occurred during signup");
   }
 });
@@ -56,7 +66,7 @@ app.post("/login", async (req, res) => {
     const check = await LogInCollection.findOne({ email: req.body.email });
 
     if (!check) {
-      return res.send("wrong details");
+      return res.send("Wrong details");
     }
 
     const isMatch = await check.comparePassword(req.body.password);
@@ -64,15 +74,14 @@ app.post("/login", async (req, res) => {
     if (isMatch) {
       return res.status(201).render("home", { naming: `${req.body.name}` });
     } else {
-      return res.send("incorrect password");
+      return res.send("Incorrect password");
     }
   } catch (e) {
-    // Catch any other errors
     console.error(e);
-    return res.send("wrong details");
+    return res.send("Wrong details");
   }
 });
 
 app.listen(port, () => {
-  console.log("port connected");
+  console.log("Port connected");
 });

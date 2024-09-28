@@ -17,33 +17,19 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, "Please provide password"],
     minlength: 8,
-    validate: {
-      validator: function (v) {
-        return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(
-          v
-        );
-      },
-      message: (props) =>
-        "Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one number, and one special character.",
-    },
   },
   mobile_number: {
-    type: Number,
+    type: String, // Changed to String
     required: [true, "Please enter the mobile Number"],
     validate: {
       validator: function (v) {
-        return /^\d{10}$/.test(v.toString());
+        return /^\d{10}$/.test(v);
       },
       message: (props) =>
         `${props.value} is not a valid 10-digit mobile number!`,
     },
   },
 });
-
-const connect = mongoose.connect(process.env.MONGODB_URI, { 
-   
-});
-
 
 // Virtual field for confirm password
 userSchema
@@ -65,7 +51,6 @@ userSchema.pre("save", function (next) {
   }
   next();
 });
-
 
 // Pre-save hook to hash the password
 userSchema.pre("save", async function (next) {
